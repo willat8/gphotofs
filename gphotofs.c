@@ -309,6 +309,8 @@ gphotofs_getattr(const char *path,
    gpointer value;
    guint i;
    int event_ret = 0;
+   OpenFile *openFile;
+   unsigned long int dataSize;
 
    event_ret = gphotofs_check_events();
    if (event_ret == GP_ERROR_IO_USB_FIND || event_ret == GP_ERROR_MODEL_NOT_FOUND)
@@ -349,12 +351,15 @@ gphotofs_getattr(const char *path,
       }
    }
 
+   openFile = g_hash_table_lookup(p->reads, path);
+   if (openFile) gp_file_get_data_and_size(openFile->file, NULL, &dataSize);
+
    if (mystbuf) {
       stbuf->st_mode = mystbuf->st_mode;
       stbuf->st_nlink = mystbuf->st_nlink;
       stbuf->st_uid = mystbuf->st_uid;
       stbuf->st_gid = mystbuf->st_gid;
-      stbuf->st_size = mystbuf->st_size;
+      stbuf->st_size = dataSize;
       stbuf->st_blocks = mystbuf->st_blocks;
       stbuf->st_mtime = mystbuf->st_mtime;
    } else {
